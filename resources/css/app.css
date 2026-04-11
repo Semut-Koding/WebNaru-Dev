@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.vue';
+
+@theme {
+    /* ═══ Typography ═══ */
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+
+    /* ═══ Primary Colors ═══ */
+    --color-forest-deep: #1B4D3E;       /* Deep Forest Green — header, navbar */
+    --color-forest-emerald: #10B981;     /* Vibrant Emerald — CTA, success */
+
+    /* ═══ Secondary & Accent Colors ═══ */
+    --color-earth-wood: #8B5A2B;         /* Earth Wood — secondary elements */
+    --color-sunrise-orange: #F59E0B;     /* Sunrise Orange — promo, warning */
+    --color-sky-blue: #0EA5E9;           /* Sky Blue — links, info badges */
+
+    /* ═══ Background & Neutral ═══ */
+    --color-bg-light: #FDFBF7;           /* Creamy Off-White */
+    --color-bg-dark: #0F172A;            /* Deep Slate (dark mode) */
+    --color-bg-dark-alt: #064E3B;        /* Forest Dark (dark mode alt) */
+    --color-text-base: #1F2937;          /* Charcoal Gray — body text */
+
+    /* ═══ Extended Palette (Auto-generated shades) ═══ */
+    --color-forest-50: #ECFDF5;
+    --color-forest-100: #D1FAE5;
+    --color-forest-200: #A7F3D0;
+    --color-forest-300: #6EE7B7;
+    --color-forest-400: #34D399;
+    --color-forest-500: #10B981;
+    --color-forest-600: #059669;
+    --color-forest-700: #047857;
+    --color-forest-800: #065F46;
+    --color-forest-900: #1B4D3E;
+
+    /* ═══ Radius & Spacing Standards ═══ */
+    --radius-card: 1rem;                 /* rounded-xl — kartu, modal */
+    --radius-button: 0.75rem;            /* rounded-lg — tombol */
+    --radius-input: 0.5rem;              /* rounded-md — input field */
+}
+
+/* Custom soft shadow untuk Sims */
+.shadow-forest {
+  box-shadow: 0 4px 20px rgba(27, 77, 62, 0.08),
+              0 2px 8px rgba(27, 77, 62, 0.04);
+}
+
+.shadow-forest-lg {
+  box-shadow: 0 8px 40px rgba(27, 77, 62, 0.12),
+              0 4px 16px rgba(27, 77, 62, 0.06);
+}
