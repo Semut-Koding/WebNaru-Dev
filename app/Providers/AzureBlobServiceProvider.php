@@ -15,6 +15,9 @@ use MicrosoftAzure\Storage\Blob\BlobRestProxy;
  *
  * Registers the 'azure' filesystem driver using League\Flysystem v3
  * Azure Blob Storage adapter. Required for media uploads to Azure.
+ *
+ * Also registers a custom URL generator since the Azure adapter
+ * is not natively recognized by Laravel's FilesystemAdapter.
  */
 class AzureBlobServiceProvider extends ServiceProvider
 {
@@ -29,15 +32,53 @@ class AzureBlobServiceProvider extends ServiceProvider
 
             $client = BlobRestProxy::createBlobService($connectionString);
 
-            $adapter = new AzureBlobStorageAdapter(
+            // Build base URL for public access
+            $baseUrl = $config['url'] ?? sprintf(
+                'https://%s.blob.core.windows.net/%s',
+                $config['name'],
+                $config['container']
+            );
+
+            // Use a wrapper adapter that supports getUrl()
+            $adapter = new AzureBlobStorageAdapterWithUrl(
                 $client,
                 $config['container'],
-                $config['prefix'] ?? ''
+                $config['prefix'] ?? '',
+                $baseUrl
             );
 
             $filesystem = new Filesystem($adapter, $config);
 
             return new FilesystemAdapter($filesystem, $adapter, $config);
         });
+    }
+}
+
+/**
+ * Extends AzureBlobStorageAdapter to add getUrl() support.
+ * Laravel's FilesystemAdapter checks method_exists($adapter, 'getUrl')
+ * to resolve URLs — the base adapter doesn't have this method.
+ */
+class AzureBlobStorageAdapterWithUrl extends AzureBlobStorageAdapter
+{
+    protected string $baseUrl;
+
+    public function __construct(
+        $client,
+        string $container,
+        string $prefix = '',
+        string $baseUrl = ''
+    ) {
+        parent::__construct($client, $container, $prefix);
+        $this->baseUrl = rtrim($baseUrl, '/');
+    }
+
+    /**
+     * Get the public URL for a file path.
+     * Called by Laravel's FilesystemAdapter->url()
+     */
+    public function getUrl(string $path): string
+    {
+        return $this->baseUrl . '/' . ltrim($path, '/');
     }
 }
