@@ -35,7 +35,8 @@ class AzureBlobServiceProvider extends ServiceProvider
             $client = BlobRestProxy::createBlobService($connectionString);
 
             // Build base URL for SAS URL generation
-            $baseUrl = $config['url'] ?? sprintf(
+            // Base URL is account-level (no container) — SAS getUrl() appends container
+            $baseUrl = sprintf(
                 'https://%s.blob.core.windows.net',
                 $config['name']
             );
