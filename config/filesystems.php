@@ -67,22 +67,21 @@ return [
         'media' => [
             'driver'    => env('MEDIA_DISK_DRIVER', 's3'),
 
-            // Azure Blob config (driver=azure reads: name, key, container)
+            // Azure Blob config (driver=azure)
             'name'      => env('AZURE_STORAGE_NAME'),
+            'key'       => env('AZURE_STORAGE_KEY', env('AWS_ACCESS_KEY_ID')),
             'container' => env('AZURE_STORAGE_CONTAINER', 'narustorage'),
-            'key'       => env('MEDIA_DISK_DRIVER') === 'azure'
-                            ? env('AZURE_STORAGE_KEY')
-                            : env('AWS_ACCESS_KEY_ID'),
 
-            // S3 / MinIO config (driver=s3 reads: key, secret, bucket, endpoint, region)
+            // S3 / MinIO config (driver=s3)
             'secret'    => env('AWS_SECRET_ACCESS_KEY'),
             'region'    => env('AWS_DEFAULT_REGION', 'us-east-1'),
             'bucket'    => env('AWS_BUCKET'),
             'endpoint'  => env('AWS_ENDPOINT'),
-            'url'       => env('MEDIA_DISK_DRIVER') === 'azure'
-                            ? env('AZURE_STORAGE_URL') . '/' . env('AZURE_STORAGE_CONTAINER', 'narustorage')
-                            : env('AWS_URL'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+
+            // URL for public access — set via env
+            'url'       => env('MEDIA_DISK_URL', env('AWS_URL')),
+
             'throw'     => false,
             'report'    => false,
             'visibility' => 'public',
