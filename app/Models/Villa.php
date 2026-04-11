@@ -41,8 +41,10 @@ class Villa extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('cover_image')
+            ->useDisk('media')
             ->singleFile();
 
-        $this->addMediaCollection('gallery_images');
+        $this->addMediaCollection('gallery_images')
+            ->useDisk('media');
     }
 }
