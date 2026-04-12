@@ -10,7 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
@@ -63,9 +63,9 @@ class AttractionCounterForm
                             }),
                     ])
                     ->schema([
-                        Placeholder::make('operational_hours_info')
+                        TextEntry::make('operational_hours_info')
                             ->label('')
-                            ->content(function () {
+                            ->state(function () {
                                 $isWeekend = Carbon::now()->isWeekend();
                                 $openKey = $isWeekend ? 'operational_hour_weekend_open' : 'operational_hour_weekday_open';
                                 $closeKey = $isWeekend ? 'operational_hour_weekend_close' : 'operational_hour_weekday_close';

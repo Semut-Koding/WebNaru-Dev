@@ -7,7 +7,7 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Placeholder;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -123,11 +123,11 @@ class UserForm
                             ->autocomplete(false)
                             ->password()
                             ->required(fn($record) => $record === null)
-                            ->dehydrated(fn($state) => filled($state))
+                            ->saved(fn (?string $state): bool => filled($state))
                             ->revealable(),
-                        Placeholder::make('role_reminder')
+                        TextEntry::make('role_reminder')
                             ->label('')
-                            ->content(new HtmlString(
+                            ->state(new HtmlString(
                                 '<div class="flex items-center gap-2 p-3 text-sm text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10 rounded-lg border border-amber-200 dark:border-amber-500/20">' .
                                 '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>' .
                                 '<span><strong>Perhatian:</strong> Setelah data pegawai berhasil disimpan, jangan lupa untuk mengatur <strong>Peran & Jabatan</strong> melalui menu Edit.</span>' .
@@ -182,8 +182,7 @@ class UserForm
                             ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
                             ->action(function ($livewire) {
                                 $data = $livewire->form->getState();
-                                $data['id'] = $livewire->record->id;
-                                User::where('id', $data['id'])->update($data);
+                                $livewire->record->update($data);
                                 Notification::make()
                                     ->title('Berhasil Diperbarui')
                                     ->body('Data Pegawai berhasil diperbarui')

@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -120,12 +120,12 @@ class ReservationForm
         return (int) $cleaned;
     }
 
-    private static function summaryPlaceholder(string $name): Placeholder
+    private static function summaryPlaceholder(string $name): TextEntry
     {
-        return Placeholder::make($name)
+        return TextEntry::make($name)
             ->label('')
             ->columnSpanFull()
-            ->content(function (Get $get) {
+            ->state(function (Get $get) {
                 $checkIn = $get('check_in_date');
                 $checkOut = $get('check_out_date');
                 $villaId = $get('villa_id');
@@ -274,24 +274,12 @@ class ReservationForm
                     Step::make('Unit Villa')
                         ->description('Pilih Ketersediaan Unit')
                         ->schema([
-                            Select::make('villa_id')
-                                ->label('Tipe Villa')
-                                ->options(Villa::where('status', 'available')->pluck('name', 'id'))
-                                ->preload()
-                                ->native(false)
-                                ->required()
-                                ->live()
-                                ->afterStateUpdated(function (Set $set, Get $get) {
-                                    $set('villa_unit_id', null);
-                                    self::recalculateTotalPrice($set, $get);
-                                }),
-
                             // Info ketersediaan unit villa
-                            Placeholder::make('villa_availability_info')
+                            TextEntry::make('villa_availability_info')
                                 ->label('')
                                 ->columnSpanFull()
                                 ->visible(fn(Get $get) => $get('villa_id') && $get('check_in_date') && $get('check_out_date'))
-                                ->content(function (Get $get) {
+                                ->state(function (Get $get) {
                                     $villaId = $get('villa_id');
                                     $checkIn = $get('check_in_date');
                                     $checkOut = $get('check_out_date');
@@ -338,6 +326,18 @@ class ReservationForm
                                         );
                                     }
                                 }),
+                            Select::make('villa_id')
+                                ->label('Tipe Villa')
+                                ->options(Villa::where('status', 'available')->pluck('name', 'id'))
+                                ->preload()
+                                ->native(false)
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(function (Set $set, Get $get) {
+                                    $set('villa_unit_id', null);
+                                    self::recalculateTotalPrice($set, $get);
+                                }),
+
 
                             Select::make('villa_unit_id')
                                 ->label('Pilih Unit Villa')
@@ -509,9 +509,9 @@ class ReservationForm
                                     Hidden::make('unit_price')
                                         ->default(0),
 
-                                    Placeholder::make('addon_subtotal')
+                                    TextEntry::make('addon_subtotal')
                                         ->label('Subtotal')
-                                        ->content(function (Get $get) {
+                                        ->state(function (Get $get) {
                                             $addonId = $get('addon_id');
                                             if (!$addonId)
                                                 return 'Rp 0';
@@ -536,9 +536,9 @@ class ReservationForm
                                 ->live()
                                 ->afterStateUpdated(fn(Set $set, Get $get) => self::recalculateTotalPrice($set, $get)),
 
-                            Placeholder::make('addons_total_display')
+                            TextEntry::make('addons_total_display')
                                 ->label('')
-                                ->content(function (Get $get) {
+                                ->state(function (Get $get) {
                                     $addonsTotal = self::calculateAddonsTotal($get);
                                     if ($addonsTotal <= 0)
                                         return '';
@@ -592,9 +592,9 @@ class ReservationForm
                                                 ->suffix('%')
                                                 ->default(30)
                                                 ->live(),
-                                            Placeholder::make('dp_preview')
+                                            TextEntry::make('dp_preview')
                                                 ->label('Perkiraan DP')
-                                                ->content(function (Get $get) {
+                                                ->state(function (Get $get) {
                                                     $percent = (int) ($get('dp_percent') ?? 0);
                                                     $totalRaw = (int) ($get('current_total') ?? 0);
                                                     $dpValue = (int) round($totalRaw * $percent / 100);

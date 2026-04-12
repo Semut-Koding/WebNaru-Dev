@@ -62,6 +62,7 @@ class AttractionCounterTableWidget extends BaseWidget
             ->keyBy('attraction_id');
 
         return $table
+            ->description("Pantau distribusi trafik pengunjung: rekapitulasi validasi tiket harian, okupansi wahana, dan ringkasan aktivitas operasional secara real-time.")
             ->query(Attraction::query()->where('status', 'active'))
             ->columns([
                 TextColumn::make('name')
