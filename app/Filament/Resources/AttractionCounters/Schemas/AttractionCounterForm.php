@@ -110,6 +110,7 @@ class AttractionCounterForm
                             ->label('Jumlah Tiket Valid')
                             ->hint('Minimal 1 tiket')
                             ->required()
+                            ->minValue(1)
                             ->default(0)
                             ->inputMode('numeric')
                             ->extraInputAttributes([
