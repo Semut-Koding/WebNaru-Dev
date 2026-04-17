@@ -191,6 +191,16 @@ class AttractionCounterForm
                                 }
 
                                 $data = $livewire->form->getState();
+
+                                // 2. Validasi Minimal 1 Tiket (Barikade Baru)
+                                if (($data['count'] ?? 0) < 1) {
+                                    Notification::make()
+                                        ->title('Jumlah Tidak Valid')
+                                        ->body('Anda tidak bisa menyimpan data dengan jumlah 0 tiket.')
+                                        ->warning()
+                                        ->send();
+                                    return; // Hentikan proses simpan
+                                }
                                 AttractionCounter::create($data);
                                 session(['last_attraction_id' => $data['attraction_id']]);
                                 Notification::make()
@@ -217,6 +227,17 @@ class AttractionCounterForm
                                 }
 
                                 $data = $livewire->form->getState();
+
+                                // 2. Validasi Minimal 1 Tiket (Barikade Baru)
+                                if (($data['count'] ?? 0) < 1) {
+                                    Notification::make()
+                                        ->title('Gagal Memperbarui')
+                                        ->body('Minimal harus ada 1 tiket tervalidasi.')
+                                        ->warning()
+                                        ->send();
+                                    return; // Hentikan proses update
+                                }
+
                                 $data['id'] = $livewire->record->id;
                                 AttractionCounter::where('id', $data['id'])->update($data);
                                 Notification::make()

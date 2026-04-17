@@ -299,7 +299,7 @@ class VisitorCounterForm
                             ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
                             ->visible(fn($record) => $record === null)
                             ->action(function ($livewire) {
-                                // Check operational hours
+                                // Validasi jam operasional
                                 if (!self::isWithinOperationalHours()) {
                                     Notification::make()
                                         ->title('Di Luar Jam Operasional')
@@ -310,12 +310,30 @@ class VisitorCounterForm
                                 }
 
                                 $data = $livewire->form->getState();
+
+                                // Validasi minimal 1 pengunjung dari semua kategori
+                                $totalVisitors = ($data['adult_count'] ?? 0)
+                                    + ($data['teenager_count'] ?? 0)
+                                    + ($data['child_count'] ?? 0);
+
+                                if ($totalVisitors < 1) {
+                                    Notification::make()
+                                        ->title('Data Tidak Valid')
+                                        ->body('Minimal harus ada 1 pengunjung. Isi setidaknya satu dari: Dewasa, Remaja, atau Anak-anak.')
+                                        ->danger()
+                                        ->persistent() // tidak auto-dismiss
+                                        ->send();
+                                    return; // hentikan eksekusi, tidak simpan
+                                }
+
                                 VisitorCounter::create($data);
+
                                 Notification::make()
                                     ->title('Berhasil Disimpan')
                                     ->body('Data Pengunjung berhasil ditambahkan')
                                     ->success()
                                     ->send();
+
                                 return redirect()->to(VisitorCounterResource::getUrl('create'));
                             }),
                         Action::make('update')
@@ -324,7 +342,6 @@ class VisitorCounterForm
                             ->visible(fn($record) => $record !== null)
                             ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
                             ->action(function ($livewire) {
-                                // Check operational hours
                                 if (!self::isWithinOperationalHours()) {
                                     Notification::make()
                                         ->title('Di Luar Jam Operasional')
@@ -335,13 +352,31 @@ class VisitorCounterForm
                                 }
 
                                 $data = $livewire->form->getState();
+
+                                // Validasi minimal 1 pengunjung
+                                $totalVisitors = ($data['adult_count'] ?? 0)
+                                    + ($data['teenager_count'] ?? 0)
+                                    + ($data['child_count'] ?? 0);
+
+                                if ($totalVisitors < 1) {
+                                    Notification::make()
+                                        ->title('Data Tidak Valid')
+                                        ->body('Minimal harus ada 1 pengunjung. Isi setidaknya satu dari: Dewasa, Remaja, atau Anak-anak.')
+                                        ->danger()
+                                        ->persistent()
+                                        ->send();
+                                    return;
+                                }
+
                                 $data['id'] = $livewire->record->id;
                                 VisitorCounter::where('id', $data['id'])->update($data);
+
                                 Notification::make()
                                     ->title('Berhasil Diperbarui')
                                     ->body('Data Pengunjung berhasil diperbarui')
                                     ->success()
                                     ->send();
+
                                 return redirect()->to(VisitorCounterResource::getUrl('index'));
                             }),
                         Action::make('cancel')
