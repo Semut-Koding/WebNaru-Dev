@@ -55,7 +55,7 @@ class AttractionCounterForm
                             ->action(function ($livewire) {
                                 $livewire->form->fill([
                                     'attraction_id' => session('last_attraction_id'),
-                                    'count' => 1,
+                                    'count' => 0,
                                     'notes' => null,
                                     'date' => now()->toDateString(),
                                     'attraction_operator_id' => auth()->id(),
@@ -110,8 +110,7 @@ class AttractionCounterForm
                             ->label('Jumlah Tiket Valid')
                             ->hint('Minimal 1 tiket')
                             ->required()
-                            ->minValue(1)
-                            ->default(1)
+                            ->default(0)
                             ->inputMode('numeric')
                             ->extraInputAttributes([
                                 'class' => 'text-center p-4',

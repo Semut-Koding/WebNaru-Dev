@@ -10,6 +10,8 @@ use Filament\Schemas\Components\Utilities\Get;
 
 class Dashboard extends BaseDashboard
 {
+    protected static ?string $title = 'Dashboard';
+
     use BaseDashboard\Concerns\HasFiltersForm;
     // NOTE: Tidak menggunakan HasPageShield karena trait tersebut
     // memanggil abort(403) via mountCanAuthorizeAccess() SEBELUM mount() kita.

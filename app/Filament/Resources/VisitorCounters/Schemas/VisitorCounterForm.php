@@ -54,9 +54,9 @@ class VisitorCounterForm
                             ->action(function ($livewire) {
                                 $livewire->form->fill([
                                     'date' => null,
-                                    'adult_count' => 1,
-                                    'teenager_count' => 1,
-                                    'child_count' => 1,
+                                    'adult_count' => 0,
+                                    'teenager_count' => 0,
+                                    'child_count' => 0,
                                     'is_group' => null,
                                     'notes' => null,
                                 ]);
@@ -104,8 +104,7 @@ class VisitorCounterForm
                             ->label('Jumlah Dewasa')
                             ->hint('18-59 Tahun')
                             ->required()
-                            ->minValue(1)
-                            ->default(1)
+                            ->default(0)
                             ->numeric()
                             ->inputMode('numeric')
                             ->extraInputAttributes([
@@ -165,8 +164,7 @@ class VisitorCounterForm
                             ->label('Jumlah Remaja')
                             ->hint('12-17 Tahun')
                             ->required()
-                            ->minValue(1)
-                            ->default(1)
+                            ->default(0)
                             ->numeric()
                             ->inputMode('numeric')
                             ->extraInputAttributes([
@@ -226,8 +224,7 @@ class VisitorCounterForm
                             ->label('Jumlah Anak')
                             ->hint('3-11 Tahun')
                             ->required()
-                            ->minValue(1)
-                            ->default(1)
+                            ->default(0)
                             ->numeric()
                             ->inputMode('numeric')
                             ->extraInputAttributes([
