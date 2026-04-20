@@ -7,8 +7,10 @@ use App\Models\AttractionCounter;
 use App\Models\Setting;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Hidden;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -106,9 +108,15 @@ class AttractionCounterForm
                             ])
                             ->prefix(self::counterMinus())
                             ->suffix(self::counterPlus()),
+                        Toggle::make('has_notes')
+                            ->label('Tambah Catatan')
+                            ->dehydrated(false)
+                            ->live()
+                            ->default(false),
                         Textarea::make('notes')
                             ->label('Catatan')
                             ->rows(1)
+                            ->visible(fn (Get $get) => $get('has_notes'))
                             ->columnSpanFull(),
                         Hidden::make('attraction_operator_id')
                             ->default(fn() => auth()->id())

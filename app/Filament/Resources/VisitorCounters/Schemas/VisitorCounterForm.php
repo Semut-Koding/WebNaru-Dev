@@ -8,7 +8,9 @@ use App\Models\Setting;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Hidden;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -62,7 +64,7 @@ class VisitorCounterForm
             ->components([
                 Section::make('Data Pengunjung')
                     ->columnSpanFull()
-                    ->description(fn () => self::isWithinOperationalHours() ? null : '🔴 Di luar jam operasional')
+                    ->description(fn() => self::isWithinOperationalHours() ? null : '🔴 Di luar jam operasional')
                     ->afterHeader([
                         Action::make('delete')
                             ->label('Hapus Data')
@@ -113,11 +115,16 @@ class VisitorCounterForm
                         self::counterField('child_count', 'Anak (3-11)'),
 
                         Checkbox::make('is_group')
-                            ->label('Rombongan (>20 orang)')
-                            ->inline(false),
+                            ->label('Rombongan (>20 orang)'),
+                        Toggle::make('has_notes')
+                            ->label('Tambah Catatan')
+                            ->dehydrated(false)
+                            ->live()
+                            ->default(false),
                         Textarea::make('notes')
                             ->label('Catatan')
                             ->rows(1)
+                            ->visible(fn(Get $get) => $get('has_notes'))
                             ->columnSpanFull(),
                         Hidden::make('cashier_id')
                             ->default(fn() => auth()->id())
@@ -127,7 +134,7 @@ class VisitorCounterForm
                         Action::make('create')
                             ->label(self::isWithinOperationalHours() ? 'Simpan & Tambah Lagi' : '🔒 Di Luar Jam Operasional')
                             ->color(self::isWithinOperationalHours() ? 'primary' : 'gray')
-                            ->disabled(fn () => !self::isWithinOperationalHours())
+                            ->disabled(fn() => !self::isWithinOperationalHours())
                             ->extraAttributes(['class' => 'w-full sm:w-auto'])
                             ->visible(fn($record) => $record === null)
                             ->action(function ($livewire) {
@@ -171,7 +178,7 @@ class VisitorCounterForm
                         Action::make('update')
                             ->label(self::isWithinOperationalHours() ? 'Perbarui' : '🔒 Di Luar Jam Operasional')
                             ->color(self::isWithinOperationalHours() ? 'primary' : 'gray')
-                            ->disabled(fn () => !self::isWithinOperationalHours())
+                            ->disabled(fn() => !self::isWithinOperationalHours())
                             ->visible(fn($record) => $record !== null)
                             ->extraAttributes(['class' => 'w-full sm:w-auto'])
                             ->action(function ($livewire) {

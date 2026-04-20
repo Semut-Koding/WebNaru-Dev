@@ -2,7 +2,15 @@
 
 <button type="button"
     onmousedown="event.preventDefault()"
+    ontouchstart="event.preventDefault()"
     onclick="
+        let input = this.closest('.fi-input-wrp').querySelector('input');
+        let current = parseInt(input.value) || 0;
+        input.value = current + 1;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    "
+    ontouchend="
+        event.preventDefault();
         let input = this.closest('.fi-input-wrp').querySelector('input');
         let current = parseInt(input.value) || 0;
         input.value = current + 1;

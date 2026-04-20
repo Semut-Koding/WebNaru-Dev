@@ -3,7 +3,16 @@
 
 <button type="button"
     onmousedown="event.preventDefault()"
+    ontouchstart="event.preventDefault()"
     onclick="
+        let input = this.closest('.fi-input-wrp').querySelector('input');
+        let current = parseInt(input.value) || 0;
+        let newVal = Math.max({{ $min }}, current - 1);
+        input.value = newVal;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    "
+    ontouchend="
+        event.preventDefault();
         let input = this.closest('.fi-input-wrp').querySelector('input');
         let current = parseInt(input.value) || 0;
         let newVal = Math.max({{ $min }}, current - 1);
