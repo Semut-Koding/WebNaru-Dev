@@ -34,4 +34,12 @@ class Attraction extends Model implements HasMedia
         $this->addMediaCollection('gallery_images')
             ->useDisk('media');
     }
+
+    /**
+     * Relationship: Attraction has many AttractionCounters.
+     */
+    public function counters()
+    {
+        return $this->hasMany(AttractionCounter::class);
+    }
 }
