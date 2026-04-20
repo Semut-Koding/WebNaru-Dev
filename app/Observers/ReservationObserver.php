@@ -7,6 +7,20 @@ use App\Models\Reservation;
 class ReservationObserver
 {
     /**
+     * Handle the Reservation "created" event.
+     * Sync VillaUnit status when reservation is created with checked_in status.
+     */
+    public function created(Reservation $reservation): void
+    {
+        if ($reservation->status === 'checked_in') {
+            $unit = $reservation->villaUnit;
+            if ($unit) {
+                $unit->update(['status' => 'occupied']);
+            }
+        }
+    }
+
+    /**
      * Handle the Reservation "updated" event.
      * Sync VillaUnit status based on reservation status changes.
      */

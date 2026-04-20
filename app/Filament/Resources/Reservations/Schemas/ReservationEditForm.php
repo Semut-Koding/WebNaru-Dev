@@ -366,12 +366,35 @@ class ReservationEditForm
                                     ->columnSpan(2),
 
                                 TextInput::make('quantity')
-                                    ->label('Jumlah')
+                                    ->label(function (Get $get) {
+                                        $addon = Addon::find($get('addon_id'));
+                                        if ($addon && $addon->pricing_unit === 'per_person') {
+                                            return 'Jumlah Hari';
+                                        }
+                                        return 'Jumlah';
+                                    })
                                     ->numeric()
                                     ->default(1)
                                     ->minValue(1)
                                     ->required()
-                                    ->live(),
+                                    ->live()
+                                    ->helperText(function (Get $get) {
+                                        $addon = Addon::find($get('addon_id'));
+                                        if (!$addon) return '';
+
+                                        $qty = (int) ($get('quantity') ?? 1);
+                                        $nights = (int) ($get('nights') ?? 1);
+                                        $persons = (int) ($get('persons') ?? 1);
+                                        $name = $addon->name;
+
+                                        return match($addon->pricing_unit) {
+                                            'flat' => "{$name} {$qty} buah (sekali bayar)",
+                                            'per_night' => "{$name} {$qty} buah × {$nights} malam",
+                                            'per_person' => "{$name} {$qty} Hari × {$persons} orang",
+                                            'per_person_per_night' => "{$name} {$qty} buah × {$persons} orang × {$nights} malam",
+                                            default => '',
+                                        };
+                                    }),
 
                                 TextInput::make('nights')
                                     ->label('Malam')
