@@ -38,18 +38,17 @@ class VisitorCounterForm
     /**
      * Build a counter TextInput field with +/- buttons.
      */
-    private static function counterField(string $name, string $label, string $hint): TextInput
+    private static function counterField(string $name, string $label): TextInput
     {
         return TextInput::make($name)
             ->label($label)
-            ->hint($hint)
             ->required()
             ->default(0)
             ->numeric()
             ->inputMode('numeric')
             ->extraInputAttributes([
-                'class' => 'text-center p-4',
-                'style' => 'touch-action: manipulation;',
+                'class' => 'text-center p-2',
+                'style' => 'touch-action: manipulation; font-size: 1.1rem;',
                 'onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57',
                 'onpaste' => "return !event.clipboardData.getData('text').match(/[^\\d]/g)",
             ])
@@ -63,20 +62,7 @@ class VisitorCounterForm
             ->components([
                 Section::make('Data Pengunjung')
                     ->columnSpanFull()
-                    ->description(function () {
-                        $isWeekend = Carbon::now()->isWeekend();
-                        $openKey = $isWeekend ? 'operational_hour_weekend_open' : 'operational_hour_weekday_open';
-                        $closeKey = $isWeekend ? 'operational_hour_weekend_close' : 'operational_hour_weekday_close';
-                        $open = Setting::where('key', $openKey)->value('value') ?? '08:00';
-                        $close = Setting::where('key', $closeKey)->value('value') ?? '17:00';
-                        $isOpen = Carbon::now()->between(
-                            Carbon::today()->setTimeFromTimeString($open),
-                            Carbon::today()->setTimeFromTimeString($close)
-                        );
-                        $status = $isOpen ? '🟢 BUKA' : '🔴 TUTUP';
-                        $dayType = $isWeekend ? 'Weekend' : 'Weekday';
-                        return "{$status} · Jam Operasional ({$dayType}): {$open} - {$close}";
-                    })
+                    ->description(fn () => self::isWithinOperationalHours() ? null : '🔴 Di luar jam operasional')
                     ->afterHeader([
                         Action::make('delete')
                             ->label('Hapus Data')
@@ -122,17 +108,16 @@ class VisitorCounterForm
                             ->default(now())
                             ->required(),
 
-                        self::counterField('adult_count', 'Jumlah Dewasa', '18-59 Tahun'),
-                        self::counterField('teenager_count', 'Jumlah Remaja', '12-17 Tahun'),
-                        self::counterField('child_count', 'Jumlah Anak', '3-11 Tahun'),
+                        self::counterField('adult_count', 'Dewasa (18-59)'),
+                        self::counterField('teenager_count', 'Remaja (12-17)'),
+                        self::counterField('child_count', 'Anak (3-11)'),
 
                         Checkbox::make('is_group')
-                            ->label('Rombongan')
-                            ->hint('Lebih dari 20 orang')
-                            ->inline(false)
-                            ->extraInputAttributes(['class' => 'p-4']),
+                            ->label('Rombongan (>20 orang)')
+                            ->inline(false),
                         Textarea::make('notes')
                             ->label('Catatan')
+                            ->rows(1)
                             ->columnSpanFull(),
                         Hidden::make('cashier_id')
                             ->default(fn() => auth()->id())
@@ -140,9 +125,10 @@ class VisitorCounterForm
                     ])
                     ->footer([
                         Action::make('create')
-                            ->label('Simpan & Tambah Lagi')
-                            ->color('primary')
-                            ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
+                            ->label(self::isWithinOperationalHours() ? 'Simpan & Tambah Lagi' : '🔒 Di Luar Jam Operasional')
+                            ->color(self::isWithinOperationalHours() ? 'primary' : 'gray')
+                            ->disabled(fn () => !self::isWithinOperationalHours())
+                            ->extraAttributes(['class' => 'w-full sm:w-auto'])
                             ->visible(fn($record) => $record === null)
                             ->action(function ($livewire) {
                                 // Validasi jam operasional
@@ -183,10 +169,11 @@ class VisitorCounterForm
                                 return redirect()->to(VisitorCounterResource::getUrl('create'));
                             }),
                         Action::make('update')
-                            ->label('Perbarui')
-                            ->color('primary')
+                            ->label(self::isWithinOperationalHours() ? 'Perbarui' : '🔒 Di Luar Jam Operasional')
+                            ->color(self::isWithinOperationalHours() ? 'primary' : 'gray')
+                            ->disabled(fn () => !self::isWithinOperationalHours())
                             ->visible(fn($record) => $record !== null)
-                            ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
+                            ->extraAttributes(['class' => 'w-full sm:w-auto'])
                             ->action(function ($livewire) {
                                 if (!self::isWithinOperationalHours()) {
                                     Notification::make()

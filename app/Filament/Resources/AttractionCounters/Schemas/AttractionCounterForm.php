@@ -41,20 +41,7 @@ class AttractionCounterForm
             ->components([
                 Section::make('Data Kunjungan Wahana')
                     ->columnSpanFull()
-                    ->description(function () {
-                        $isWeekend = Carbon::now()->isWeekend();
-                        $openKey = $isWeekend ? 'operational_hour_weekend_open' : 'operational_hour_weekday_open';
-                        $closeKey = $isWeekend ? 'operational_hour_weekend_close' : 'operational_hour_weekday_close';
-                        $open = Setting::where('key', $openKey)->value('value') ?? '08:00';
-                        $close = Setting::where('key', $closeKey)->value('value') ?? '17:00';
-                        $isOpen = Carbon::now()->between(
-                            Carbon::today()->setTimeFromTimeString($open),
-                            Carbon::today()->setTimeFromTimeString($close)
-                        );
-                        $status = $isOpen ? '🟢 BUKA' : '🔴 TUTUP';
-                        $dayType = $isWeekend ? 'Weekend' : 'Weekday';
-                        return "{$status} · Jam Operasional ({$dayType}): {$open} - {$close}";
-                    })
+                    ->description(fn () => self::isWithinOperationalHours() ? null : '🔴 Di luar jam operasional')
                     ->afterHeader([
                         Action::make('delete')
                             ->label('Hapus Data')
@@ -107,14 +94,13 @@ class AttractionCounterForm
                             ->required(),
                         TextInput::make('count')
                             ->label('Jumlah Tiket Valid')
-                            ->hint('Minimal 1 tiket')
                             ->required()
                             ->minValue(1)
                             ->default(0)
                             ->inputMode('numeric')
                             ->extraInputAttributes([
-                                'class' => 'text-center p-4',
-                                'style' => 'touch-action: manipulation;',
+                                'class' => 'text-center p-2',
+                                'style' => 'touch-action: manipulation; font-size: 1.1rem;',
                                 'onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57',
                                 'onpaste' => "return !event.clipboardData.getData('text').match(/[^\\d]/g)",
                             ])
@@ -122,6 +108,7 @@ class AttractionCounterForm
                             ->suffix(self::counterPlus()),
                         Textarea::make('notes')
                             ->label('Catatan')
+                            ->rows(1)
                             ->columnSpanFull(),
                         Hidden::make('attraction_operator_id')
                             ->default(fn() => auth()->id())
@@ -129,9 +116,10 @@ class AttractionCounterForm
                     ])
                     ->footer([
                         Action::make('create')
-                            ->label('Simpan & Tambah Lagi')
-                            ->color('primary')
-                            ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
+                            ->label(self::isWithinOperationalHours() ? 'Simpan & Tambah Lagi' : '🔒 Di Luar Jam Operasional')
+                            ->color(self::isWithinOperationalHours() ? 'primary' : 'gray')
+                            ->disabled(fn () => !self::isWithinOperationalHours())
+                            ->extraAttributes(['class' => 'w-full sm:w-auto'])
                             ->visible(fn($record) => $record === null)
                             ->action(function ($livewire) {
                                 // Check operational hours
@@ -166,10 +154,11 @@ class AttractionCounterForm
                                 return redirect()->to(AttractionCounterResource::getUrl('create'));
                             }),
                         Action::make('update')
-                            ->label('Perbarui')
-                            ->color('primary')
+                            ->label(self::isWithinOperationalHours() ? 'Perbarui' : '🔒 Di Luar Jam Operasional')
+                            ->color(self::isWithinOperationalHours() ? 'primary' : 'gray')
+                            ->disabled(fn () => !self::isWithinOperationalHours())
                             ->visible(fn($record) => $record !== null)
-                            ->extraAttributes(['class' => 'w-full sm:w-auto p-4'])
+                            ->extraAttributes(['class' => 'w-full sm:w-auto'])
                             ->action(function ($livewire) {
                                 // Check operational hours
                                 if (!self::isWithinOperationalHours()) {
