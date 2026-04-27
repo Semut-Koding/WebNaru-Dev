@@ -10,6 +10,7 @@
     /* ═══ Typography ═══ */
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-accent: 'Playfair Display', serif;
 
     /* ═══ Primary Colors ═══ */
     --color-forest-deep: #1B4D3E;       /* Deep Forest Green — header, navbar */
@@ -44,7 +45,7 @@
     --radius-input: 0.5rem;              /* rounded-md — input field */
 }
 
-/* Custom soft shadow untuk Sims */
+/* ═══ Custom Shadows ═══ */
 .shadow-forest {
   box-shadow: 0 4px 20px rgba(27, 77, 62, 0.08),
               0 2px 8px rgba(27, 77, 62, 0.04);
@@ -53,4 +54,92 @@
 .shadow-forest-lg {
   box-shadow: 0 8px 40px rgba(27, 77, 62, 0.12),
               0 4px 16px rgba(27, 77, 62, 0.06);
+}
+
+/* ═══ Glassmorphism Utilities ═══ */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-white {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ═══ Scroll Reveal Animation ═══ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ═══ Splash Screen ═══ */
+.splash-exit {
+  animation: splash-slide-up 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes splash-slide-up {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(-100%); opacity: 0; }
+}
+
+/* ═══ Page Transition Bar ═══ */
+.page-loading-bar {
+  animation: loading-progress 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loading-progress {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ═══ Hero Animations ═══ */
+@keyframes slow-zoom {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.1); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* ═══ Counter Animation ═══ */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
